@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧資源回收分類系統 - SDGs永續環保</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f0f7f4;
+            color: #2c3e50;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #43a047 0%, #1b5e20 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .sdgs-banner {
+            background-color: #fff;
+            padding: 1.5rem;
+            margin: 1rem auto;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .sdgs-goals {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .sdgs-goal {
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex: 0 1 calc(33.333% - 1rem);
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background: #43a047;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            background: #2e7d32;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        #imagePreview, #camera {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .eco-tips {
+            background: #e8f5e9;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+
+        .eco-tips h3 {
+            color: #2e7d32;
+            margin-bottom: 1rem;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .sdgs-goal {
+                flex: 0 1 calc(50% - 1rem);
+            }
+        }
+
+        .result-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        .category-section {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .category-name {
+            color: #2e7d32;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .prediction-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .guide-section {
+            margin: 20px 0;
+        }
+
+        .tips-box, .notice-box, .impact-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .tips-box {
+            background-color: #f5f5f5;
+        }
+
+        .notice-box {
+            background-color: #fff3e0;
+        }
+
+        .impact-box {
+            background-color: #e3f2fd;
+        }
+
+        pre {
+            font-family: inherit;
+            white-space: pre-wrap;
+            margin: 5px 0;
+        }
+
+        .footer-note {
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .analysis-loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .error-message {
+            color: #c62828;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .sdgs-impacts {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .sdgs-impact-item {
+            background-color: #e3f2fd;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .impact-box {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>智慧資源回收分類系統</h1>
+        <p>實踐 SDGs 永續目標・共創環保未來</p>
+    </div>
+
+    <div class="container">
+        <div class="sdgs-banner">
+            <h2>永續發展目標 (SDGs)</h2>
+            <div class="sdgs-goals">
+                <div class="sdgs-goal">
+                    <h3>目標 11</h3>
+                    <p>永續城市</p>
+                    <small>建立包容、安全、韌性及永續的城市與社區</small>
+                </div>
+                <div class="sdgs-goal">
+                    <h3>目標 12</h3>
+                    <p>責任消費與生產</p>
+                    <small>確保永續的消費與生產模式</small>
+                </div>
+                <div class="sdgs-goal">
+                    <h3>目標 13</h3>
+                    <p>氣候行動</p>
+                    <small>採取緊急措施以因應氣候變遷及其影響</small>
+                </div>
+                <div class="sdgs-goal">
+                    <h3>目標 14</h3>
+                    <p>海洋生態</p>
+                    <small>保育及永續利用海洋與海洋資源</small>
+                </div>
+                <div class="sdgs-goal">
+                    <h3>目標 15</h3>
+                    <p>陸地生態</p>
+                    <small>保護、維護及促進陸域生態系統的永續使用</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="upload-section">
+            <h2>開始回收分類</h2>
+            <p>上傳照片或使用相機拍攝，讓我們協助您進行正確的回收分類</p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            <button class="btn" onclick="document.getElementById('fileInput').click()">
+                選擇照片
+            </button>
+            <button class="btn" id="cameraBtn" onclick="startCamera()">
+                開啟相機
+            </button>
+        </div>
+
+        <video id="camera" autoplay playsinline></video>
+        <button class="btn" id="captureBtn" style="display: none;" onclick="captureImage()">拍攝照片</button>
+        
+        <img id="imagePreview" alt="預覽圖片">
+
+        <div id="result"></div>
+
+        <div class="eco-tips">
+            <h3>環保小知識</h3>
+            <ul>
+                <li>每回收1個寶特瓶可節省約17.5克的石油</li>
+                <li>回收1噸紙張可以拯救17棵樹</li>
+                <li>鋁罐回收可節省95%的能源消耗</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>攜手實踐永續發展・為地球盡一份心力</p>
+        <small>© 2024 智慧資源回收分類系統</small>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <script>
+        let model = null;
+        let stream = null;
+        const camera = document.getElementById('camera');
+        const captureBtn = document.getElementById('captureBtn');
+        const imagePreview = document.getElementById('imagePreview');
+
+        // 載入模型
+        async function loadModel() {
+            try {
+                model = await mobilenet.load();
+                console.log('模型載入完成');
+            } catch (err) {
+                console.error('模型載入失敗:', err);
+            }
+        }
+        loadModel();
+
+        // 相機控制函數
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
+                });
+                camera.srcObject = stream;
+                camera.style.display = 'block';
+                captureBtn.style.display = 'block';
+                imagePreview.style.display = 'none';
+            } catch (err) {
+                console.error('相機啟動失敗:', err);
+                alert('無法啟動相機，請確認權限設定');
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                camera.style.display = 'none';
+                captureBtn.style.display = 'none';
+            }
+        }
+
+        // 檔案上傳處理
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    camera.style.display = 'none';
+                    captureBtn.style.display = 'none';
+                    if (stream) {
+                        stopCamera();
+                    }
+                    imagePreview.onload = () => analyzeImage(imagePreview);
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        // 圖片分析函數
+        async function analyzeImage(imgElement) {
+            if (!model) {
+                alert('模型尚未載入完成，請稍候');
+                return;
+            }
+
+            try {
+                document.getElementById('result').innerHTML = `
+                    <div class="analysis-loading">
+                        <p>正在分析中，請稍候...</p>
+                    </div>
+                `;
+
+                const predictions = await model.classify(imgElement, 5);
+                const topPrediction = predictions[0];
+                const category = await getDetailedCategory(predictions);
+                showRecyclingGuide(category, topPrediction);
+
+            } catch (err) {
+                console.error('分析失敗:', err);
+                document.getElementById('result').innerHTML = `
+                    <div class="error-message">
+                        無法完成分析，請重試
+                    </div>
+                `;
+            }
+        }
+
+        // 分類判斷函數
+        async function getDetailedCategory(predictions) {
+            const materialKeywords = {
+                '金屬類': ['metal', 'aluminum', 'can', 'tin', 'steel', 'iron'],
+                '塑膠類': ['plastic', 'polymer', 'container'],
+                '寶特瓶': ['bottle', 'pet', 'beverage'],
+                '玻璃': ['glass', 'bottle', 'jar', 'transparent'],
+                '紙類': ['paper', 'cardboard', 'book', 'newspaper'],
+                '紙容器': ['carton', 'box', 'packaging'],
+                '電池': ['battery', 'cell', 'power bank'],
+                '一般垃圾': ['food', 'waste', 'misc']
+            };
+
+            let scores = {};
+            predictions.forEach(pred => {
+                const description = pred.className.toLowerCase();
+                Object.entries(materialKeywords).forEach(([category, keywords]) => {
+                    keywords.forEach(keyword => {
+                        if (description.includes(keyword)) {
+                            scores[category] = (scores[category] || 0) + pred.probability;
+                        }
+                    });
+                });
+            });
+
+            let bestCategory = '一般垃圾';
+            let maxScore = 0;
+            Object.entries(scores).forEach(([category, score]) => {
+                if (score > maxScore) {
+                    maxScore = score;
+                    bestCategory = category;
+                }
+            });
+
+            return bestCategory;
+        }
+
+        // 顯示回收指南
+        function showRecyclingGuide(category, prediction) {
+            const recyclingGuide = {
+                '金屬類': {
+                    tips: '1. 清除內部食物殘渣\n2. 用水沖洗乾淨\n3. 壓扁以節省空間\n4. 標籤可以不用撕除',
+                    notice: '• 有害物質容器需特別處理\n• 電池需分開回收\n• 避免回收已生鏽金屬',
+                    examples: ['鋁罐', '鐵罐', '金屬罐頭', '鋁箔包'],
+                    sdgsImpact: [
+                        '目標11：減少都市廢棄物，促進資源循環',
+                        '目標12：節省95%能源消耗，減少原物料開採',
+                        '目標13：減少開採製造過程的碳排放',
+                        '目標15：減少礦物開採對陸地生態的影響'
+                    ]
+                },
+                '塑膠類': {
+                    tips: '1. 清除內容物\n2. 沖洗乾淨\n3. 壓扁節省空間\n4. 檢查回收標誌',
+                    notice: '• 確認材質是否可回收\n• 避免回收髒污塑膠\n• 需依材質分類',
+                    examples: ['塑膠盒', '塑膠袋', '塑膠容器'],
+                    sdgsImpact: [
+                        '目標11：改善都市廢棄物管理',
+                        '目標12：促進塑膠製品的循環經濟',
+                        '目標13：減少石油開採和加工的碳排放',
+                        '目標14：減少海洋塑膠污染',
+                        '目標15：減少塑膠對陸地生態的影響'
+                    ]
+                },
+                '寶特瓶': {
+                    tips: '1. 倒空內容物\n2. 沖洗乾淨\n3. 移除標籤\n4. 壓扁回收',
+                    notice: '• 瓶蓋可一併回收\n• 避免回收已變形發黃的寶特瓶\n• 需與其他塑膠分開',
+                    examples: ['飲料瓶', '礦泉水瓶', '運動飲料瓶'],
+                    sdgsImpact: [
+                        '目標11：改善城市環境衛生',
+                        '目標12：每個寶特瓶回收節省17.5克石油',
+                        '目標14：減少海洋塑膠污染',
+                        '目標15：減少對陸地生態系統的影響'
+                    ]
+                },
+                '紙類': {
+                    tips: '1. 移除非紙類物品（如釘書針）\n2. 確保紙張乾淨無污漬\n3. 平整摺疊\n4. 分類堆疊整齊',
+                    notice: '• 不可回收油漬紙張\n• 不可回收防水或塗蠟紙張\n• 請移除所有金屬物件\n• 潮濕紙張應先晾乾',
+                    examples: ['報紙', '雜誌', '影印紙', '書本', '紙箱'],
+                    sdgsImpact: [
+                        '目標11：促進都市資源循環利用',
+                        '目標12：回收1噸紙張可節省7000加侖水',
+                        '目標13：減少森林砍伐，保護碳匯',
+                        '目標15：每回收1噸紙張可拯救17棵樹'
+                    ]
+                },
+                '紙容器': {
+                    tips: '1. 沖洗乾淨內部\n2. 打開攤平\n3. 壓扁收納\n4. 去除塑膠吸管或封口',
+                    notice: '• 內部需完全清潔無殘留\n• 有防水層的需特別處理\n• 不可回收已嚴重髒污的容器\n• 需確保完全乾燥',
+                    examples: ['紙盒', '牛奶盒', '果汁盒', '外帶飲料杯', '紙餐盒'],
+                    sdgsImpact: [
+                        '目標11：減少都市廢棄物量',
+                        '目標12：每回收1噸可節省3立方米掩埋空間',
+                        '目標13：減少樹木砍伐，保護碳匯',
+                        '目標15：保護森林資源的永續利用'
+                    ]
+                },
+                '電池': {
+                    tips: '1. 檢查電池類型\n2. 絕緣處理\n3. 送至回收點\n4. 分類存放',
+                    notice: '• 禁止與一般垃圾混合\n• 避免受潮和高溫\n• 損壞電池需特別處理',
+                    examples: ['乾電池', '鈕扣電池', '充電電池'],
+                    sdgsImpact: [
+                        '目標11：減少有害廢棄物污染',
+                        '目標12：回收重金屬資源再利用',
+                        '目標13：減少開採製造的碳排放',
+                        '目標14：防止重金屬污染海洋',
+                        '目標15：避免土壤和地下水污染'
+                    ]
+                },
+                '一般垃圾': {
+                    tips: '1. 確認是否真的無法回收\n2. 減少包裝\n3. 適當分類\n4. 確實密封',
+                    notice: '• 盡量選擇可回收產品\n• 減少使用一次性物品\n• 注意分類規範',
+                    examples: ['髒污物品', '複合材質', '不可回收塑膠'],
+                    sdgsImpact: [
+                        '目標11：改善都市廢棄物管理',
+                        '目標12：推動源頭減量',
+                        '目標13：減少廢棄物處理的碳排放',
+                        '目標14：減少廢棄物入海',
+                        '目標15：減少掩埋場對土地的占用'
+                    ]
+                },
+                '玻璃': {
+                    tips: '1. 倒空內容物並清洗乾淨\n2. 移除瓶蓋和標籤\n3. 依顏色分類（透明、綠色、褐色）\n4. 避免破碎，完整回收',
+                    notice: '• 破損的玻璃需小心包裝\n• 耐熱玻璃需分開處理\n• 燈管、鏡子、玻璃杯不屬於此類\n• 避免與其他回收物混合',
+                    examples: ['玻璃瓶', '果醬罐', '醬油瓶', '飲料玻璃瓶'],
+                    sdgsImpact: [
+                        '目標11：促進都市資源循環利用',
+                        '目標12：玻璃可100%回收再利用，且可無限次循環',
+                        '目標13：減少原料開採和生產的碳排放',
+                        '目標14：減少玻璃廢棄物對海洋的影響',
+                        '目標15：減少矽砂開採對陸地生態的破壞'
+                    ]
+                }
+            };
+
+            const guide = recyclingGuide[category];
+            const resultHtml = `
+                <div class="result-card">
+                    <h3>回收分類建議</h3>
+                    
+                    <div class="category-section">
+                        <strong>建議分類：</strong> 
+                        <span class="category-name">${category}</span>
+                        <div class="prediction-info">
+                            識別結果：${prediction.className} (${(prediction.probability * 100).toFixed(1)}%)
+                        </div>
+                    </div>
+                    
+                    <div class="guide-section">
+                        <div class="tips-box">
+                            <strong>處理方式：</strong>
+                            <pre>${guide.tips}</pre>
+                        </div>
+                        
+                        <div class="notice-box">
+                            <strong>注意事項：</strong>
+                            <pre>${guide.notice}</pre>
+                        </div>
+                        
+                        <div class="impact-box">
+                            <strong>永續發展目標影響：</strong>
+                            <div class="sdgs-impacts">
+                                ${guide.sdgsImpact.map(impact => `<div class="sdgs-impact-item">${impact}</div>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-note">
+                        此建議僅供參考，請依照當地回收規範處理。
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('result').innerHTML = resultHtml;
+        }
+
+        // 拍照功能
+        function captureImage() {
+            const canvas = document.createElement('canvas');
+            canvas.width = camera.videoWidth;
+            canvas.height = camera.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(camera, 0, 0, canvas.width, canvas.height);
+            
+            imagePreview.src = canvas.toDataURL('image/jpeg');
+            imagePreview.style.display = 'block';
+            
+            stopCamera();
+            
+            imagePreview.onload = () => analyzeImage(imagePreview);
+        }
+    </script>
+</body>
+</html>
